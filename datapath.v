@@ -108,19 +108,5 @@ module datapath(
       end
    end
 
-   // assign read_data = mem[adr >> 2]; // word aligned read of the memory
-
-   // always @(posedge clk) begin
-   //    if (mem_write)
-   //      data_mem[alu_out >> 2] <= rs2_data;
-   // end
-
-
-   // assign read_data = (result_src == 2'b01) ? data_mem[alu_out >> 2] : 32'b0;
-
-   // always @(posedge clk) begin
-   //    if (reg_write)
-   //      reg_file[instr[11:7]] <= (result_src == 2'b01) ? read_data : alu_out;
-   // end
 
 endmodule
