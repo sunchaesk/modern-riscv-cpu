@@ -20,6 +20,7 @@ module control_tb;
    wire [3:0]  current_state;
    wire [31:0] pc_out; // PC output
 
+
    // Instantiate the control unit
    control cu (
                .clk(clk),
@@ -59,7 +60,6 @@ module control_tb;
                 .d_alu_result(alu_out)
                 );
 
-
    // debug init
    integer     i;
 
@@ -89,13 +89,13 @@ module control_tb;
       // dp.reg_file[2] = 32'h00000010;
       // dp.reg_file[2] = 32'h00000000;
       dp.reg_file[1] = 32'h00000018;
-      dp.reg_file[2] = 32'h00000000;
+      dp.reg_file[2] = 32'h00000001;
 
       // load data_mem
       // dp.mem[0] = 32'h00000018;
 
       // Load word instruction (lw x1, 0(x2))
-      instr = 32'b00000000000100010010000000100011; // sw x1, 0(x2)
+      instr = 32'b00000000001000001000000110110011; // add x3, x1, x2
       #50;
 
       // Monitor signals

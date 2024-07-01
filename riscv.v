@@ -34,7 +34,6 @@ module riscv (
     datapath dp (
         .clk(clk),
         .reset(reset),
-        .instr(instr),
         .mem_write(mem_write),
         .reg_write(reg_write),
         .ir_write(ir_write),
@@ -45,7 +44,7 @@ module riscv (
         .alu_src_b(alu_src_b),
         .alu_control(alu_control),
         .instr_out(instr_out),
-        .d_pc_out(pc_out),
+        // .d_pc_out(pc_out),
         .d_alu_result(alu_result)
     );
 

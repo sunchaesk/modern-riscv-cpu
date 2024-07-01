@@ -55,7 +55,14 @@ module control (
    always @(*) begin
       case (curr_state)
         FETCH: next_state = DECODE;
-        DECODE: next_state = MEM_ADR;
+        DECODE: case (opcode)
+                  OP_LW: next_state = MEM_ADR;
+                  OP_SW: next_state = MEM_ADR;
+                  OP_R: next_state = EXECUTE_R;
+                  OP_I: next_state = EXECUTE_I;
+                  OP_J: next_state = JUMP;
+                  OP_B: next_state = BRANCH;
+                endcase
         MEM_ADR: case (opcode)
                    OP_LW: next_state = MEM_RD;
                    OP_SW: next_state = MEM_WR;
@@ -63,6 +70,11 @@ module control (
         MEM_RD: next_state = MEM_WB;
         MEM_WR: next_state = FETCH;
         MEM_WB: next_state = FETCH;
+        EXECUTE_R: next_state = ALU_WB;
+        EXECUTE_I: next_state = ALU_WB;
+        JUMP: next_state = ALU_WB;
+        ALU_WB: next_state = FETCH;
+        BRANCH: next_state = FETCH;
         default: next_state = FETCH;
       endcase
    end
@@ -86,8 +98,10 @@ module control (
            alu_control = 3'b000; // ALU performs addition
            alu_src_a = 2'b00; // ALU source A is PC
            alu_src_b = 2'b01; // ALU source B is 4
+           result_src = 2'b10; //
         end
         DECODE: begin
+
            // Decode logic here, update next state based on opcode
         end
         MEM_ADR: begin
@@ -107,6 +121,15 @@ module control (
         MEM_WB: begin
            result_src = 2'b01; // Data memory output
            reg_write = 1'b1; // Enable register write
+        end
+        EXECUTE_R: begin
+           alu_src_a = 2'b01; // rs1 data
+           alu_src_b = 2'b00; // rs2 data
+           alu_control = 3'b000; // add op
+        end
+        ALU_WB: begin
+           result_src = 2'b00; // alu_out reg
+           reg_write = 1'b1; // enable regwrite signal
         end
       endcase
    end

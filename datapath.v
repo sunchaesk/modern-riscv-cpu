@@ -1,7 +1,6 @@
 module datapath(
                 input         clk,
                 input         reset,
-                input [31:0]  instr,
                 input         mem_write,
                 input         reg_write,
                 input         ir_write,
@@ -12,17 +11,15 @@ module datapath(
                 input [1:0]   alu_src_b,
                 input [2:0]   alu_control,
                 output [31:0] instr_out,
-                // output [31:0] read_data,
                 output [31:0] d_pc_out, // Added output for PC
                 output [31:0] d_alu_result
                 );
 
    reg [31:0]                 pc;
+   reg [31:0]                 next_pc;
    reg [31:0]                 ir;
    reg [31:0]                 reg_file [0:31];
    reg [31:0]                 mem [0:1023];
-   // reg [31:0]                 instr_mem [0:1023];
-   // reg [31:0]                 data_mem [0:1023];
    reg [31:0]                 alu_out;
    reg [31:0]                 data;
    reg [31:0]                 alu_result;
@@ -40,25 +37,25 @@ module datapath(
    assign d_alu_result = alu_out;
    assign data = read_data;
 
-   assign rs1 = instr[19:15];
-   assign rs2 = instr[24:20];
+   assign rs1 = ir[19:15];
+   assign rs2 = ir[24:20];
 
    assign rs1_data = reg_file[rs1];
    assign rs2_data = reg_file[rs2];
-   assign immediate = {{20{instr[31]}}, instr[31:20]};
+   assign immediate = {{20{ir[31]}}, ir[31:20]};
 
    always @(posedge clk or posedge reset) begin
       if (reset) begin
          pc <= 0;
          ir <= 0;
       end else begin
-         if (pc_write) pc <= alu_out;
-         if (ir_write) ir <= (instruction_or_data ? 32'bz : mem[pc >> 2]);
+         if (pc_write) pc <= next_pc;
+         if (ir_write) ir <= mem[pc >> 2]; // Fetch instruction from memory
          read_data <= mem[adr >> 2];
       end
    end
 
-   // essentially muxes in the multicycle processor
+   // ALU source muxes
    always @(*) begin
       case (alu_src_a)
         2'b00: alu_a = pc;
@@ -74,6 +71,7 @@ module datapath(
         default: alu_b = 32'b0;
       endcase
 
+      // ALU operation
       case (alu_control)
         3'b000: alu_result = alu_a + alu_b; // ADD
         3'b001: alu_result = alu_a - alu_b; // SUB
@@ -81,19 +79,21 @@ module datapath(
         default: alu_result = 32'b0;
       endcase
 
+      // Result selection
       case (result_src)
         2'b00: result = alu_out;
         2'b01: result = data;
         2'b10: result = alu_result;
       endcase
 
+      // Address selection
       case (instruction_or_data)
-        2'b0: adr = pc;
-        2'b1: adr = result;
+        1'b0: adr = pc;
+        1'b1: adr = result;
       endcase
    end
 
-   // alu_out ff logic
+   // ALU result register
    always @(posedge clk) begin
       if (reset) begin
          alu_out <= 32'b0;
@@ -102,16 +102,26 @@ module datapath(
       end
    end
 
+   // Register file write
    always @(posedge clk) begin
       if (reg_write) begin
-         reg_file[instr[11:7]] <= result;
+         reg_file[ir[11:7]] <= result;
       end
    end
 
-   // mem_wr
+   // Memory write
    always @(posedge clk) begin
       if (mem_write) begin
          mem[alu_out >> 2] <= rs2_data;
+      end
+   end
+
+   // PC update
+   always @(posedge clk or posedge reset) begin
+      if (reset) begin
+         next_pc <= 0;
+      end else begin
+         if (pc_write) next_pc <= alu_result; // Store result to next_pc during fetch cycle
       end
    end
 
