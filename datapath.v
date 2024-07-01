@@ -12,7 +12,7 @@ module datapath(
                 input [1:0]   alu_src_b,
                 input [2:0]   alu_control,
                 output [31:0] instr_out,
-                output [31:0] read_data,
+                // output [31:0] read_data,
                 output [31:0] d_pc_out, // Added output for PC
                 output [31:0] d_alu_result
                 );
@@ -20,14 +20,16 @@ module datapath(
    reg [31:0]                 pc;
    reg [31:0]                 ir;
    reg [31:0]                 reg_file [0:31];
-   reg [31:0]                 instr_mem [0:1023];
-   reg [31:0]                 data_mem [0:1023];
+   reg [31:0]                 mem [0:1023];
+   // reg [31:0]                 instr_mem [0:1023];
+   // reg [31:0]                 data_mem [0:1023];
    reg [31:0]                 alu_out;
    reg [31:0]                 data;
    reg [31:0]                 alu_result;
    reg [31:0]                 adr;
    reg [31:0]                 result;
 
+   wire [31:0]                read_data;
    wire [31:0]                rs1_data, rs2_data;
    wire [31:0]                immediate;
    wire [4:0]                 rs1, rs2;
@@ -51,7 +53,7 @@ module datapath(
          ir <= 0;
       end else begin
          if (pc_write) pc <= alu_out;
-         if (ir_write) ir <= (instruction_or_data ? 32'bz : instr_mem[pc >> 2]);
+         if (ir_write) ir <= (instruction_or_data ? 32'bz : mem[pc >> 2]);
       end
    end
 
@@ -98,6 +100,8 @@ module datapath(
          alu_out <= alu_result;
       end
    end
+
+   assign read_data = mem[adr >> 2]; // word aligned read of the memory
 
    // always @(posedge clk) begin
    //    if (mem_write)

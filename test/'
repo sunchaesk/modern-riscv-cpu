@@ -54,7 +54,7 @@ module control_tb;
                 .alu_src_b(alu_src_b),
                 .alu_control(alu_control),
                 .instr_out(instr_out),
-                // .read_data(read_data),
+                .read_data(read_data),
                 .d_pc_out(pc_out), // Connect PC output
                 .d_alu_result(alu_out)
                 );
@@ -78,14 +78,13 @@ module control_tb;
 
       // Release reset
       reset = 0;
-      #10;
 
       // load register values
       dp.reg_file[2] = 32'h00000010;
 
       // load data_mem
-      dp.mem[15] = 32'h00000008;
-      dp.mem[15] = 32'h00000008;
+      dp.mem[16] = 32'h00000008;
+      dp.mem[1] = 32'h00000008;
 
       // Load word instruction (lw x1, 0(x2))
       instr = 32'b00000000000000010010000010000011; // lw x1, 0(x2)
