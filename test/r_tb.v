@@ -20,14 +20,13 @@ module control_tb;
    wire [3:0]  current_state;
    wire [31:0] pc_out; // PC output
 
-
    // Instantiate the control unit
    control cu (
                .clk(clk),
                .reset(reset),
-               .opcode(instr[6:0]),
-               .funct3(instr[14:12]),
-               .funct7(instr[31:25]),
+               .opcode(instr_out[6:0]),
+               .funct3(instr_out[14:12]),
+               .funct7(instr_out[31:25]),
                .mem_write(mem_write),
                .reg_write(reg_write),
                .ir_write(ir_write),
@@ -76,7 +75,13 @@ module control_tb;
 
    // Test sequence
    initial begin
+      // instr = 32'b00000000000000010010000010000011; // lw x1, 0(x2)
       // Initialize inputs
+
+      dp.mem[0] = 32'b00000000001000001000000110110011; // add x3, x1, x2
+      // dp.mem[1] = 32'b11000000000000000010000000000011;
+      // dp.mem[2] = 32'b11100000000000000010000000000011;
+
       reset = 1;
       #10;
 
@@ -85,17 +90,14 @@ module control_tb;
       #10;
 
       // load register values
-      // dp.reg_file[2] = 32'h00000010;
-      // dp.reg_file[2] = 32'h00000000;
-      dp.reg_file[1] = 32'h00000018;
-      dp.reg_file[2] = 32'h00000001;
+      dp.reg_file[1] = 32'h00000001;
+      dp.reg_file[2] = 32'h00000010;
 
       // load data_mem
-      // dp.mem[0] = 32'h00000018;
 
       // Load word instruction (lw x1, 0(x2))
-      instr = 32'b00000000001000001000000110110011; // add x3, x1, x2
-      #50;
+      // instr= 32'b00000000010000010010000010000011; // lw x1, 4(x2)
+      #150;
 
       // Monitor signals
       $monitor("Time: %0d, State: %0b, PC: %0h, ALU out: %h", $time, current_state, pc_out, alu_out);
@@ -111,14 +113,6 @@ module control_tb;
          end
       end
       $display("===DONE PRINTING REGISTER CONTENTS===\n");
-
-      $display("===PRINTING MEM CONTENTS===");
-      for (i = 0; i < 1024; i = i + 1) begin
-         if (dp.mem[i] != 0) begin
-            $display("MEM: x%d = 0x%0h", i, dp.mem[i]);
-         end
-      end
-      $display("===DONE PRINTING MEM CONTENTS===");
 
       // Finish simulation
       $finish;
