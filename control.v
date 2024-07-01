@@ -133,5 +133,4 @@ module control (
         end
       endcase
    end
-
 endmodule

@@ -16,7 +16,7 @@ module datapath(
                 );
 
    reg [31:0]                 pc;
-   reg [31:0]                 next_pc;
+   wire [31:0]                next_pc;
    reg [31:0]                 ir;
    reg [31:0]                 reg_file [0:31];
    reg [31:0]                 mem [0:1023];
@@ -116,13 +116,19 @@ module datapath(
       end
    end
 
+   // always @(posedge clk or posedge reset) begin
+   //    if (reset) begin
+   //       next_pc <= 4;
+   //    end
+   // end
+   assign next_pc = alu_result;
    // PC update
-   always @(posedge clk or posedge reset) begin
-      if (reset) begin
-         next_pc <= 0;
-      end else begin
-         if (pc_write) next_pc <= alu_result; // Store result to next_pc during fetch cycle
-      end
-   end
+   // always @(posedge clk or posedge reset) begin
+   //    if (reset) begin
+   //       next_pc <= 4;
+   //    end else begin
+   //       if (pc_write) next_pc <= alu_result; // Store result to next_pc during fetch cycle
+   //    end
+   // end
 
 endmodule

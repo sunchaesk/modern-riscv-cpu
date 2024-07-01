@@ -44,7 +44,6 @@ module control_tb;
    datapath dp (
                 .clk(clk),
                 .reset(reset),
-                .instr(instr),
                 .mem_write(mem_write),
                 .reg_write(reg_write),
                 .ir_write(ir_write),
