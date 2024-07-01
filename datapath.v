@@ -116,19 +116,7 @@ module datapath(
       end
    end
 
-   // always @(posedge clk or posedge reset) begin
-   //    if (reset) begin
-   //       next_pc <= 4;
-   //    end
-   // end
+   // pc update stuff
    assign next_pc = alu_result;
-   // PC update
-   // always @(posedge clk or posedge reset) begin
-   //    if (reset) begin
-   //       next_pc <= 4;
-   //    end else begin
-   //       if (pc_write) next_pc <= alu_result; // Store result to next_pc during fetch cycle
-   //    end
-   // end
 
 endmodule
