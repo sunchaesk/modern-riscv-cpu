@@ -131,6 +131,11 @@ module control (
            result_src = 2'b00; // alu_out reg
            reg_write = 1'b1; // enable regwrite signal
         end
+        EXECUTE_I: begin
+           alu_src_a = 2'b01; // rs1 data
+           alu_src_b = 2'b10; // imm
+           alu_control = 3'b000; // add op
+        end
       endcase
    end
 endmodule
