@@ -96,8 +96,13 @@ module control (
            alu_src_b = 2'b10; // ALU source B is immediate
         end
         MEM_RD: begin
-           result_src = 2'b00;
+           result_src = 2'b00; // alu_out
            instruction_or_data = 1; // Accessing data memory
+        end
+        MEM_WR: begin // mem_write
+           result_src = 2'b00; // alu_out
+           instruction_or_data = 1'b1; // accessing data memory
+           mem_write = 1'b1; // write to memory
         end
         MEM_WB: begin
            result_src = 2'b01; // Data memory output
