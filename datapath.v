@@ -108,5 +108,11 @@ module datapath(
       end
    end
 
+   // mem_wr
+   always @(posedge clk) begin
+      if (mem_write) begin
+         mem[alu_out >> 2] <= rs2_data;
+      end
+   end
 
 endmodule

@@ -86,10 +86,12 @@ module control_tb;
 
       // load register values
       // dp.reg_file[2] = 32'h00000010;
+      // dp.reg_file[2] = 32'h00000000;
+      dp.reg_file[1] = 32'h00000008;
       dp.reg_file[2] = 32'h00000000;
 
       // load data_mem
-      dp.mem[0] = 32'h00000018;
+      // dp.mem[0] = 32'h00000018;
 
       // Load word instruction (lw x1, 0(x2))
       instr = 32'b00000000000100010010000000100011; // sw x1, 0(x2)
@@ -109,6 +111,14 @@ module control_tb;
          end
       end
       $display("===DONE PRINTING REGISTER CONTENTS===\n");
+
+      $display("===PRINTING MEM CONTENTS===");
+      for (i = 0; i < 1024; i = i + 1) begin
+         if (dp.mem[i] != 0) begin
+            $display("MEM: x%d = 0x%0h", i, dp.mem[i]);
+         end
+      end
+      $display("===DONE PRINTING MEM CONTENTS===");
 
       // Finish simulation
       $finish;
