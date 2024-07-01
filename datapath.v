@@ -29,7 +29,7 @@ module datapath(
    reg [31:0]                 adr;
    reg [31:0]                 result;
 
-   wire [31:0]                read_data;
+   reg [31:0]                 read_data;
    wire [31:0]                rs1_data, rs2_data;
    wire [31:0]                immediate;
    wire [4:0]                 rs1, rs2;
@@ -54,6 +54,7 @@ module datapath(
       end else begin
          if (pc_write) pc <= alu_out;
          if (ir_write) ir <= (instruction_or_data ? 32'bz : mem[pc >> 2]);
+         read_data <= mem[adr >> 2];
       end
    end
 
@@ -101,7 +102,13 @@ module datapath(
       end
    end
 
-   assign read_data = mem[adr >> 2]; // word aligned read of the memory
+   always @(posedge clk) begin
+      if (reg_write) begin
+         reg_file[instr[11:7]] <= result;
+      end
+   end
+
+   // assign read_data = mem[adr >> 2]; // word aligned read of the memory
 
    // always @(posedge clk) begin
    //    if (mem_write)
