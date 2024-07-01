@@ -56,8 +56,12 @@ module control (
       case (curr_state)
         FETCH: next_state = DECODE;
         DECODE: next_state = MEM_ADR;
-        MEM_ADR: next_state = MEM_RD;
+        MEM_ADR: case (opcode)
+                   OP_LW: next_state = MEM_RD;
+                   OP_SW: next_state = MEM_WR;
+                 endcase
         MEM_RD: next_state = MEM_WB;
+        MEM_WR: next_state = FETCH;
         MEM_WB: next_state = FETCH;
         default: next_state = FETCH;
       endcase
@@ -103,4 +107,3 @@ module control (
    end
 
 endmodule
-alu_src_a = 2'b0;

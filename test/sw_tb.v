@@ -6,7 +6,7 @@ module control_tb;
    reg reset;
    reg [31:0] instr;
    wire [31:0] instr_out;
-   wire [31:0] read_data;
+   // wire [31:0] read_data;
    wire [31:0] alu_out;
    wire        mem_write;
    wire        reg_write;
@@ -54,10 +54,14 @@ module control_tb;
                 .alu_src_b(alu_src_b),
                 .alu_control(alu_control),
                 .instr_out(instr_out),
-                .read_data(read_data),
+                // .read_data(read_data),
                 .d_pc_out(pc_out), // Connect PC output
                 .d_alu_result(alu_out)
                 );
+
+   // debug init
+   integer     i;
+
 
    // Clock generation
    initial begin
@@ -78,27 +82,33 @@ module control_tb;
 
       // Release reset
       reset = 0;
+      #10;
 
       // load register values
-      dp.reg_file[2] = 32'h00000010;
+      // dp.reg_file[2] = 32'h00000010;
+      dp.reg_file[2] = 32'h00000000;
 
       // load data_mem
-      dp.mem[16] = 32'h00000008;
-      dp.mem[1] = 32'h00000008;
+      dp.mem[0] = 32'h00000018;
 
       // Load word instruction (lw x1, 0(x2))
-      instr = 32'b00000000000000010010000010000011; // lw x1, 0(x2)
-      // instr= 32'b00000000010000010010000010000011; // lw x1, 4(x2)
+      instr = 32'b00000000000100010010000000100011; // sw x1, 0(x2)
       #50;
 
       // Monitor signals
-      $monitor("Time: %0d, State: %0b, PC: %0h, Read Data: %0h, ALU out: %h", $time, current_state, pc_out,  read_data, alu_out);
+      $monitor("Time: %0d, State: %0b, PC: %0h, ALU out: %h", $time, current_state, pc_out, alu_out);
 
       // Run through a few cycles
       #100;
 
-      // Check state and signals at each cycle
-
+      // check register values
+      $display("===PRINTING REGISTER CONTENTS===");
+      for (i = 0; i < 32; i = i + 1) begin
+         if (dp.reg_file[i] != 0) begin
+            $display("REG: x%d = 0x%0h", i, dp.reg_file[i]);
+         end
+      end
+      $display("===DONE PRINTING REGISTER CONTENTS===\n");
 
       // Finish simulation
       $finish;
