@@ -16,7 +16,7 @@ module control (
                 output reg       ir_write,
                 output reg       pc_write,
                 output reg       instruction_or_data,
-                output reg [1:0] result_src
+                output reg [1:0] result_src,
                 output reg [1:0] alu_src_a,
                 output reg [1:0] alu_src_b,
                 output reg [2:0] alu_control,
@@ -30,11 +30,10 @@ module control (
    localparam                    MEM_WB = 4'b0100;
    localparam                    MEM_WR = 4'b0101;
    localparam                    EXECUTE_R = 4'b0110;
-   localparam                    ALU_WB = 4'b0111; // for both EXECUTE_R, EXECUTE_I
+   localparam                    ALU_WB = 4'b0111;
    localparam                    EXECUTE_I = 4'b1000;
    localparam                    JUMP = 4'b1001;
    localparam                    BRANCH = 4'b1010;
-
 
    localparam                    OP_LW = 7'b0000011;
    localparam                    OP_SW = 7'b0100011;
@@ -60,6 +59,7 @@ module control (
         MEM_ADR: next_state = MEM_RD;
         MEM_RD: next_state = MEM_WB;
         MEM_WB: next_state = FETCH;
+        default: next_state = FETCH;
       endcase
    end
 
@@ -72,35 +72,35 @@ module control (
       pc_write = 1'b0;
       instruction_or_data = 1'b0;
       result_src = 2'b0;
-      alu_src_a = 2'b0;
       alu_src_b = 2'b0;
       alu_control = 3'b0;
       case (curr_state)
         FETCH: begin
-           pc_write = 1; // enable -> write to the PC reg
-           ir_write = 1; // load instr to the IR reg
-           instruction_or_data = 0; // accessing instruction memory
-           alu_control = 3'b0; // addition
-           alu_src_a = 2'b00; // pc
-           alu_src_b = 2'b01; // 4
+           pc_write = 1; // Enable PC write
+           ir_write = 1; // Enable IR write
+           instruction_or_data = 0; // Accessing instruction memory
+           alu_control = 3'b000; // ALU performs addition
+           alu_src_a = 2'b00; // ALU source A is PC
+           alu_src_b = 2'b01; // ALU source B is 4
         end
         DECODE: begin
-
+           // Decode logic here, update next state based on opcode
         end
         MEM_ADR: begin
-           alu_control = 3'b0; // add
-           alu_src_a = 2'b01; // rs1
-           alu_src_b = 2'b10; // immediate
+           alu_control = 3'b000; // ALU performs addition
+           alu_src_a = 2'b01; // ALU source A is rs1
+           alu_src_b = 2'b10; // ALU source B is immediate
         end
         MEM_RD: begin
            result_src = 2'b00;
-           instruction_or_data = 1; // accessing data memory
+           instruction_or_data = 1; // Accessing data memory
         end
         MEM_WB: begin
-           result_src = 2'b01; // data
-           reg_write = 1'b1;
+           result_src = 2'b01; // Data memory output
+           reg_write = 1'b1; // Enable register write
         end
       endcase
    end
 
 endmodule
+alu_src_a = 2'b0;
