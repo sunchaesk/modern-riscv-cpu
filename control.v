@@ -19,7 +19,7 @@ module control (
                 output reg [1:0] result_src,
                 output reg [1:0] alu_src_a,
                 output reg [1:0] alu_src_b,
-                output reg [2:0] alu_control,
+                output reg [3:0] alu_control,
                 output [3:0]     current_state
                 );
 
@@ -89,13 +89,13 @@ module control (
       instruction_or_data = 1'b0;
       result_src = 2'b0;
       alu_src_b = 2'b0;
-      alu_control = 3'b0;
+      alu_control = 4'b0;
       case (curr_state)
         FETCH: begin
            pc_write = 1; // Enable PC write
            ir_write = 1; // Enable IR write
            instruction_or_data = 0; // Accessing instruction memory
-           alu_control = 3'b000; // ALU performs addition
+           alu_control = 4'b0000; // ALU performs addition
            alu_src_a = 2'b00; // ALU source A is PC
            alu_src_b = 2'b01; // ALU source B is 4
            result_src = 2'b10; //
@@ -105,7 +105,7 @@ module control (
            // Decode logic here, update next state based on opcode
         end
         MEM_ADR: begin
-           alu_control = 3'b000; // ALU performs addition
+           alu_control = 4'b0000; // ALU performs addition
            alu_src_a = 2'b01; // ALU source A is rs1
            alu_src_b = 2'b10; // ALU source B is immediate
         end
@@ -125,7 +125,7 @@ module control (
         EXECUTE_R: begin
            alu_src_a = 2'b01; // rs1 data
            alu_src_b = 2'b00; // rs2 data
-           alu_control = 3'b000; // add op
+           alu_control = {funct7[5], funct3}; // add op
         end
         ALU_WB: begin
            result_src = 2'b00; // alu_out reg
@@ -134,7 +134,7 @@ module control (
         EXECUTE_I: begin
            alu_src_a = 2'b01; // rs1 data
            alu_src_b = 2'b10; // imm
-           alu_control = 3'b000; // add op
+           alu_control = {funct7[5], funct3}; // add op
         end
       endcase
    end

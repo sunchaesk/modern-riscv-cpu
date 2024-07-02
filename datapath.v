@@ -9,7 +9,7 @@ module datapath(
                 input [1:0]   result_src,
                 input [1:0]   alu_src_a,
                 input [1:0]   alu_src_b,
-                input [2:0]   alu_control,
+                input [3:0]   alu_control,
                 output [31:0] instr_out,
                 output [31:0] d_pc_out, // Added output for PC
                 output [31:0] d_alu_result
@@ -31,6 +31,7 @@ module datapath(
    wire [31:0]                immediate;
    wire [4:0]                 rs1, rs2;
    reg [31:0]                 alu_a, alu_b;
+   reg                        zero_flag;
 
    assign instr_out = ir;
    assign d_pc_out = pc; // Output the PC value
@@ -55,6 +56,15 @@ module datapath(
       end
    end
 
+   // ALU operation
+   ALU alu_unit (
+                 .in_a(alu_a),
+                 .in_b(alu_b),
+                 .alu_control(alu_control),
+                 .alu_result(alu_result),
+                 .zero_flag(zero_flag)
+                 );
+
    // ALU source muxes
    always @(*) begin
       case (alu_src_a)
@@ -71,13 +81,12 @@ module datapath(
         default: alu_b = 32'b0;
       endcase
 
-      // ALU operation
-      case (alu_control)
-        3'b000: alu_result = alu_a + alu_b; // ADD
-        3'b001: alu_result = alu_a - alu_b; // SUB
-        // Add more ALU operations here
-        default: alu_result = 32'b0;
-      endcase
+      // case (alu_control)
+      //   3'b000: alu_result = alu_a + alu_b; // ADD
+      //   3'b001: alu_result = alu_a - alu_b; // SUB
+      //   // Add more ALU operations here
+      //   default: alu_result = 32'b0;
+      // endcase
 
       // Result selection
       case (result_src)
