@@ -43,7 +43,14 @@ module datapath(
 
    assign rs1_data = reg_file[rs1];
    assign rs2_data = reg_file[rs2];
-   assign immediate = {{20{ir[31]}}, ir[31:20]};
+
+   // assign immediate = {{20{ir[31]}}, ir[31:20]};
+
+   immediate_gen immediate_generator_unit (
+                                           .instruction(ir),
+                                           .opcode(ir[6:0]),
+                                           .immediate_out(immediate)
+                                           );
 
    always @(posedge clk or posedge reset) begin
       if (reset) begin
