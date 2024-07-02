@@ -17,6 +17,7 @@ module datapath(
 
    reg [31:0]                 pc;
    wire [31:0]                next_pc;
+   reg [31:0]                 old_pc;
    reg [31:0]                 ir;
    reg [31:0]                 reg_file [0:31];
    reg [31:0]                 mem [0:1023];
@@ -58,7 +59,10 @@ module datapath(
          ir <= 0;
       end else begin
          if (pc_write) pc <= next_pc;
-         if (ir_write) ir <= mem[pc >> 2]; // Fetch instruction from memory
+         if (ir_write) begin
+            old_pc <= pc;
+            ir <= mem[pc >> 2]; // Fetch instruction from memory
+         end
          read_data <= mem[adr >> 2];
       end
    end
@@ -77,6 +81,7 @@ module datapath(
       case (alu_src_a)
         2'b00: alu_a = pc;
         2'b01: alu_a = rs1_data;
+        2'b10: alu_a = old_pc;
         default: alu_a = 32'b0;
       endcase
 
@@ -87,13 +92,6 @@ module datapath(
         2'b11: alu_b = 0;
         default: alu_b = 32'b0;
       endcase
-
-      // case (alu_control)
-      //   3'b000: alu_result = alu_a + alu_b; // ADD
-      //   3'b001: alu_result = alu_a - alu_b; // SUB
-      //   // Add more ALU operations here
-      //   default: alu_result = 32'b0;
-      // endcase
 
       // Result selection
       case (result_src)

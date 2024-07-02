@@ -101,8 +101,12 @@ module control (
            result_src = 2'b10; //
         end
         DECODE: begin
-
-           // Decode logic here, update next state based on opcode
+           // NOTE: during the BRANCH instruction, the decode phase
+           // can be used to calculate the target address in the case of
+           // BRANCH instruction
+           alu_src_a = 2'b10; // old_pc
+           alu_src_b = 2'b10; // immediate
+           alu_control = 4'b0000; // ALU add : calculate potential branch location
         end
         MEM_ADR: begin
            alu_control = 4'b0000; // ALU performs addition
@@ -135,6 +139,11 @@ module control (
            alu_src_a = 2'b01; // rs1 data
            alu_src_b = 2'b10; // imm
            alu_control = {funct7[5], funct3}; // add op
+        end
+        JUMP: begin
+
+        end
+        BRANCH: begin
         end
       endcase
    end
