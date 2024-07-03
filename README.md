@@ -1,11 +1,5 @@
-# Expanding the naive multicycle riscv processor with CompArch techniques
+# Multicycle RISCV CPU
 
-## DONE
-- Multicycle implementation of the riscv cpu (full basic instructions support)
+![top module](./img/2024-07-02_23-56.png)
+![datapath](./img/2024-07-02_23-58.png)
 
-## TODO
-- pipelining
-- superscalar
-- vector processor
-- out of order execution
-- branch prediction
