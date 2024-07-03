@@ -8,6 +8,7 @@
 module control (
                 input            clk,
                 input            reset,
+                input            zero_flag, // signal whether to take the branch or not
                 input [6:0]      opcode,
                 input [2:0]      funct3,
                 input [6:0]      funct7,
@@ -144,6 +145,13 @@ module control (
 
         end
         BRANCH: begin
+           alu_src_a = 2'b01; // rs1 data
+           alu_src_b = 2'b00; // rs2 data
+           alu_control = 4'b1000; // sub
+           result_src = 2'b00;
+           if (zero_flag == 1'b1) begin // alu returned zero meaning rs1_data - rs2_data = 0 therefore equal
+              pc_write = 1'b1;
+           end
         end
       endcase
    end

@@ -10,6 +10,7 @@ module datapath(
                 input [1:0]   alu_src_a,
                 input [1:0]   alu_src_b,
                 input [3:0]   alu_control,
+                output        zero_flag,
                 output [31:0] instr_out,
                 output [31:0] d_pc_out, // Added output for PC
                 output [31:0] d_alu_result
@@ -32,7 +33,7 @@ module datapath(
    wire [31:0]                immediate;
    wire [4:0]                 rs1, rs2;
    reg [31:0]                 alu_a, alu_b;
-   reg                        zero_flag;
+   // reg                        zero_flag;
 
    assign instr_out = ir;
    assign d_pc_out = pc; // Output the PC value
@@ -131,6 +132,6 @@ module datapath(
    end
 
    // pc update stuff
-   assign next_pc = alu_result;
+   assign next_pc = result;
 
 endmodule

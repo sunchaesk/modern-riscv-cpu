@@ -2,6 +2,8 @@
 
 module control_tb;
 
+   wire zero_flag;
+
    reg clk;
    reg reset;
    reg [31:0] instr;
@@ -16,7 +18,7 @@ module control_tb;
    wire [1:0]  result_src;
    wire [1:0]  alu_src_a;
    wire [1:0]  alu_src_b;
-   wire [2:0]  alu_control;
+   wire [3:0]  alu_control;
    wire [3:0]  current_state;
    wire [31:0] pc_out; // PC output
 
@@ -24,6 +26,7 @@ module control_tb;
    control cu (
                .clk(clk),
                .reset(reset),
+               .zero_flag(zero_flag),
                .opcode(instr_out[6:0]),
                .funct3(instr_out[14:12]),
                .funct7(instr_out[31:25]),
@@ -52,6 +55,7 @@ module control_tb;
                 .alu_src_a(alu_src_a),
                 .alu_src_b(alu_src_b),
                 .alu_control(alu_control),
+                .zero_flag(zero_flag),
                 .instr_out(instr_out),
                 // .read_data(read_data),
                 .d_pc_out(pc_out), // Connect PC output
@@ -76,8 +80,14 @@ module control_tb;
    // Test sequence
    initial begin
 
-      dp.mem[0] = 32'b00000000001000001000000110110011; // add x3, x1, x2
-      dp.mem[1] = 32'b00000000001000001000100001100011; // beq x1, x2, 16
+      // dp.mem[0] = 32'b00000000001000001000000110110011; // add x3, x1, x2
+      // dp.mem[1] = 32'b00000000001000001000100001100011; // beq x1, x2, 16
+
+      dp.mem[0] = 32'b00000000001000001000100001100011; // beq x1, x2, 16
+      dp.mem[4] = 32'b10000000000000001000000110010011; // addi x3, x1, 0
+      dp.mem[5] = 32'b11000000000000001000000110010011;
+      dp.mem[6] = 32'b11100000000000001000000110010011;
+
 
       reset = 1;
       #10;
