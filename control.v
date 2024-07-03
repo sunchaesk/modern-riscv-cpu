@@ -145,7 +145,11 @@ module control (
            alu_control = {funct7[5], funct3}; // add op
         end
         JUMP: begin
-
+           alu_src_a = 2'b10; // old_pc
+           alu_src_b = 2'b01; // 4
+           alu_control = 4'b0000; // add op to calc old_pc + 4
+           result_src = 2'b00; // using alu_out which is jump address calculated previously
+           pc_write = 1'b1; // write the jump address calculated in DECODE state to next_pc
         end
         BRANCH: begin
            alu_src_a = 2'b01; // rs1 data
