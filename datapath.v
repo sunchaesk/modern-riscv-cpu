@@ -9,8 +9,10 @@ module datapath(
                 input [1:0]   result_src,
                 input [1:0]   alu_src_a,
                 input [1:0]   alu_src_b,
+                input [2:0]   branch_type, // for branch_type
                 input [3:0]   alu_control,
                 output        zero_flag,
+                output        branch_taken,
                 output [31:0] instr_out,
                 output [31:0] d_pc_out, // Added output for PC
                 output [31:0] d_alu_result
@@ -76,6 +78,13 @@ module datapath(
                  .alu_result(alu_result),
                  .zero_flag(zero_flag)
                  );
+
+   branch_condition branch_condition_unit (
+                                           .operand_a(rs1_data),
+                                           .operand_b(rs2_data),
+                                           .branch_type(branch_type),
+                                           .branch_control(branch_taken)
+                                           );
 
    // ALU source muxes
    always @(*) begin

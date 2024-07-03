@@ -9,6 +9,7 @@ module control (
                 input            clk,
                 input            reset,
                 input            zero_flag, // signal whether to take the branch or not
+                input            branch_taken,
                 input [6:0]      opcode,
                 input [2:0]      funct3,
                 input [6:0]      funct7,
@@ -20,6 +21,7 @@ module control (
                 output reg [1:0] result_src,
                 output reg [1:0] alu_src_a,
                 output reg [1:0] alu_src_b,
+                output reg [2:0] branch_type,
                 output reg [3:0] alu_control,
                 output [3:0]     current_state
                 );
@@ -90,6 +92,7 @@ module control (
       instruction_or_data = 1'b0;
       result_src = 2'b0;
       alu_src_b = 2'b0;
+      branch_type = 3'b0;
       alu_control = 4'b0;
       case (curr_state)
         FETCH: begin
@@ -147,9 +150,9 @@ module control (
         BRANCH: begin
            alu_src_a = 2'b01; // rs1 data
            alu_src_b = 2'b00; // rs2 data
-           alu_control = 4'b1000; // sub
            result_src = 2'b00;
-           if (zero_flag == 1'b1) begin // alu returned zero meaning rs1_data - rs2_data = 0 therefore equal
+           branch_type = funct3;
+           if (branch_taken == 1'b1) begin
               pc_write = 1'b1;
            end
         end
